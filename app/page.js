@@ -1,3 +1,4 @@
+// page.js
 'use client'
 
 import Image from "next/image";
@@ -5,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { firestore } from '@/firebase';
 import { Box, Modal, Typography, Stack, TextField, Button } from '@mui/material';
 import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc } from 'firebase/firestore';
+import CameraComponent from './camera'; // Updated import
 
 export default function Home() {
 
@@ -14,6 +16,7 @@ export default function Home() {
   const [itemCount, setItemCount] = useState('');
   const [editingItem, setEditingItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [cameraOpen, setCameraOpen] = useState(false); // State to toggle camera
 
   const updateInventory = async function () {
     const snapshot = query(collection(firestore, 'inventory'));
@@ -212,6 +215,12 @@ export default function Home() {
         <Stack direction="row" spacing={3} alignItems="center" width="100%">
           <Button
             variant="contained"
+            onClick={function () { setCameraOpen(!cameraOpen); }} // Toggle camera component
+          >
+            {cameraOpen ? "Close Camera" : "Open Camera"}
+          </Button>
+          <Button
+            variant="contained"
             onClick={function () { handleOpen(); }}
           >
             Add new item
@@ -222,9 +231,10 @@ export default function Home() {
             onChange={handleSearchChange}
             placeholder="Search item name"
             p={3}
-            sx={{ width: '50%'}}
+            sx={{ width: '50%' }}
           />
         </Stack>
+        {cameraOpen && <CameraComponent />} {/* Conditionally render the camera component */}
         <Box width="100%" height="100px" borderRadius={3} display="flex" flexDirection='row' justifyContent="space-between" p={4} bgcolor="#0277bd">
           <Typography variant="h5" sx={{ color: "white" }}>Name</Typography>
           <Typography variant="h5" sx={{ color: "white" }}>Count</Typography>
