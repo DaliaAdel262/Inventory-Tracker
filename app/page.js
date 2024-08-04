@@ -1,12 +1,13 @@
-// page.js
+
 'use client'
 
 import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { firestore } from '@/firebase';
 import { Box, Modal, Typography, Stack, TextField, Button } from '@mui/material';
-import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc } from 'firebase/firestore';
-import CameraComponent from './camera'; // Updated import
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, addDoc } from 'firebase/firestore';
+import CameraComponent from './camera'; 
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 
 export default function Home() {
 
@@ -16,7 +17,7 @@ export default function Home() {
   const [itemCount, setItemCount] = useState('');
   const [editingItem, setEditingItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [cameraOpen, setCameraOpen] = useState(false); // State to toggle camera
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const updateInventory = async function () {
     const snapshot = query(collection(firestore, 'inventory'));
@@ -94,6 +95,28 @@ export default function Home() {
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
+  };
+
+  const uploadPhoto = async (photo) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, 'photos/' + Date.now());
+  
+    try {
+      await uploadString(storageRef, photo, 'data_url');
+  
+      const url = await getDownloadURL(storageRef);
+  
+      const photosCollection = collection(firestore, 'photos');
+      await addDoc(photosCollection, {
+        url,
+        timestamp: Date.now(),
+      });
+  
+      console.log('Photo uploaded and URL saved in Firestore');
+      return url;
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+    }
   };
 
   useEffect(function () {
@@ -215,7 +238,7 @@ export default function Home() {
         <Stack direction="row" spacing={3} alignItems="center" width="100%">
           <Button
             variant="contained"
-            onClick={function () { setCameraOpen(!cameraOpen); }} // Toggle camera component
+            onClick={function () { setCameraOpen(!cameraOpen); }} 
           >
             {cameraOpen ? "Close Camera" : "Open Camera"}
           </Button>
@@ -234,7 +257,7 @@ export default function Home() {
             sx={{ width: '50%' }}
           />
         </Stack>
-        {cameraOpen && <CameraComponent />} {/* Conditionally render the camera component */}
+        {cameraOpen && <CameraComponent />}
         <Box width="100%" height="100px" borderRadius={3} display="flex" flexDirection='row' justifyContent="space-between" p={4} bgcolor="#0277bd">
           <Typography variant="h5" sx={{ color: "white" }}>Name</Typography>
           <Typography variant="h5" sx={{ color: "white" }}>Count</Typography>
