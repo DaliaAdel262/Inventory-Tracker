@@ -97,27 +97,7 @@ export default function Home() {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
-  const uploadPhoto = async (photo) => {
-    const storage = getStorage();
-    const storageRef = ref(storage, 'photos/' + Date.now());
   
-    try {
-      await uploadString(storageRef, photo, 'data_url');
-  
-      const url = await getDownloadURL(storageRef);
-  
-      const photosCollection = collection(firestore, 'photos');
-      await addDoc(photosCollection, {
-        url,
-        timestamp: Date.now(),
-      });
-  
-      console.log('Photo uploaded and URL saved in Firestore');
-      return url;
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-    }
-  };
 
   useEffect(function () {
     updateInventory();
