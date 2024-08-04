@@ -110,7 +110,7 @@ export default function Home() {
       alignItems='center'
       gap={2}
     >
-      <Typography variant="h1">Inventory</Typography>
+      <Typography variant="h1" p={5} sx={{mt:3}}>Inventory</Typography>
 
       {/*ADD MODAL*/}
       <Modal
